@@ -53,7 +53,7 @@ async def on_message(message):
             moneyA[idA.index(ID)] += give
             f = open("UserData.txt", "w") #저장
             for i in range(0,len(idA),1):
-                f.write(str(idA[i])+","+str(moneyA[i])+","+str(timeA[i])+","+message.author.name+"\n")
+                f.write(str(idA[i])+","+str(moneyA[i])+","+str(timeA[i])+"\n")
             f.close()
         elif not ID in idA:
             idA.append(ID)
@@ -61,7 +61,7 @@ async def on_message(message):
             timeA.append(int(time.time()))
             f = open("UserData.txt", "w") #저장
             for i in range(0,len(idA),1):
-                f.write(str(idA[i])+","+str(moneyA[i])+","+str(timeA[i])+","+message.author.name+"\n")
+                f.write(str(idA[i])+","+str(moneyA[i])+","+str(timeA[i])+"\n")
             f.close()
         msg = str(give)+"코인을 받았습니다. 현재 스카이코인 : "+str(moneyA[idA.index(ID)])+"코인"
         embed = discord.Embed(title='', description=msg, color=0x00FF00)
