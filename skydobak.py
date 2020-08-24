@@ -6,7 +6,7 @@ import os, random, time
 client = discord.Client()
 
 #사용하는 변수들
-idA, moneyA, preA, timeA, give, ID, TIME = [], [], [], [], 0, 0, 0
+idA, moneyA, preA, slitA, timeA, give, ID, TIME = [], [], [], [], [], 0, 0, 0
 
 
 try: #만약 파일이 없으면 새로 만듦
@@ -15,7 +15,6 @@ except:
     f = open("UserData.txt", "w")
     f.close()
     f = open("UserData.txt", "r")
-    w = open("member.txt", "r")
 while True: #유저들 데이터를 읽음 데이터 형식 : 유저ID,가지고 있는 돈,돈받은 시간
     line = f.readline()
     if not line: break
@@ -23,10 +22,12 @@ while True: #유저들 데이터를 읽음 데이터 형식 : 유저ID,가지고
     idA.append(line[0])
     moneyA.append(int(line[1]))
     timeA.append(int(line[2]))
-while True:
-    line = w.readline()
-    if not line: break
-    preA.append(line)
+    slitA.append(int(line[3]))
+with open("member.txt", "r") as w:
+    while True:
+        line = w.readline()
+        if not line: break
+        preA.append(line)#아 귀찮아
 
 
 f.close()
@@ -53,7 +54,7 @@ async def on_message(message):
             moneyA[idA.index(ID)] += give
             f = open("UserData.txt", "w") #저장
             for i in range(0,len(idA),1):
-                f.write(str(idA[i])+","+str(moneyA[i])+","+str(timeA[i])+","+message.author.name+"\n")
+                f.write(str(idA[i]) + "," + str(moneyA[i]) + "," + str(timeA[i]) + "," + str(0) + "\n")
             f.close()
         elif not ID in idA:
             idA.append(ID)
@@ -61,7 +62,7 @@ async def on_message(message):
             timeA.append(int(time.time()))
             f = open("UserData.txt", "w") #저장
             for i in range(0,len(idA),1):
-                f.write(str(idA[i])+","+str(moneyA[i])+","+str(timeA[i])+","+message.author.name+"\n")
+                f.write(str(idA[i]) + "," + str(moneyA[i]) + "," + str(timeA[i]) + "," + str(0) + "\n")
             f.close()
         msg = str(give)+"코인을 받았습니다. 현재 스카이코인 : "+str(moneyA[idA.index(ID)])+"코인"
         embed = discord.Embed(title='', description=msg, color=0x00FF00)
@@ -84,6 +85,29 @@ async def on_message(message):
         adminlist = [488670402118156298, 653075791814590487] #관리자
         if message.author.id in adminlist: #관리자라면 테슽 할것도 있고 하니 돈 많이 줌
             give = 999
+        if slitA[idA.index(ID)] == "1":
+            give = random.randrange(1, 11)
+            moneygive = random.randrange(5, 21)
+            if give == 1 or give == 2:
+                embed = discord.Embed(title="도박 실패..", description="도박을 성공했으면 [ " + str(
+                    moneygive) + "배 ] 의 돈을 얻을 수 있었는데 실패했네요.. \n \n 현재 스카이코인 • " + str(moneyA[idA.index(ID)]) + " 코인",
+                                      timestamp=message.created_at, colour=discord.Colour.dark_red())
+                embed.set_footer(text="도박권을 사용했을 때의 도박 확률은 80 : 20 이에요!")
+                await message.channel.send(embed=embed)
+            elif give <= 3:
+                moneyA[idA.index(ID)] += give * msg[1]
+                embed = discord.Embed(title="도박 성공!", description="도박을 성공하여 [ " + str(
+                    moneygive) + "배 ] 의 돈을 얻었어요! \n \n 현재 스카이코인 • " + str(
+                    moneyA[idA.index(ID)]) + " 코인", timestamp=message.created_at,
+                                      colour=discord.Colour.dark_green()
+                                      )
+                embed.set_footer(text="도박 확률은 80 : 20 이에요!")
+                await message.channel.send(embed=embed)
+            f = open("UserData.txt", "w")  # 저장
+            for i in range(0, len(idA), 1):
+                f.write(str(idA[i]) + "," + str(moneyA[i]) + "," + str(timeA[i]) + "," + str(0) + "\n")
+                f.close()
+            raise IndexError
         if not ID in preA:
             if give % 2 == 0 or message.author.id in adminlist: #어드민일 때는 무조건 도박 성공
                 moneyA[idA.index(ID)] += give*msg[1]
@@ -100,9 +124,9 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
             f = open("UserData.txt", "w") #저장
             for i in range(0,len(idA),1):
-                f.write(str(idA[i])+","+str(moneyA[i])+","+str(timeA[i])+"\n")
+                f.write(str(idA[i]) + "," + str(moneyA[i]) + "," + str(timeA[i]) + "," + str(0) + "\n")
                 f.close()
-        else:
+        else: #프리미엄 유저일 때
             give = random.randrange(1,11)
             moneygive = random.randrange(5,21)
             if give == 1 or give == 2:
@@ -119,7 +143,7 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
             f = open("UserData.txt", "w")  # 저장
             for i in range(0, len(idA), 1):
-                f.write(str(idA[i]) + "," + str(moneyA[i]) + "," + str(timeA[i]) + "\n")
+                f.write(str(idA[i]) + "," + str(moneyA[i]) + "," + str(timeA[i]) + "," + str(0) + "\n")
                 f.close()
 
 
@@ -141,23 +165,28 @@ async def on_message(message):
         embed.add_field(name=f"1위", value=f"{filt[1]}원 보유")
         embed.add_field(name=f"2위", value=f"{filt[2]}원 보유")
         embed.add_field(name=f"3위", value=f"{filt[3]}원 보유")
+        await message.channel.send(embed = embed)
 
     if message.content == "/올인":
+        pas = False
         ID = str(message.author.id)
         if not ID in idA or moneyA[idA.index(ID)] <= 0: #만약 돈이 부족하면
             embed = discord.Embed(title='', description='코인이 부족합니다.', color=0xFF0000)
             await message.channel.send(embed=embed)
             raise ValueError
+        if ID in preA:#프리미엄은 올인 못하게 하기(ㅈㄴ 귀찮음)
+            await message.channel.send("프리미엄 유저는 /올인 을 사용할 수 없습니다!")
+            pas = True
         give = random.randrange(2,10)
         await asyncio.sleep(1)
-        if give % 2 == 0:
+        if give % 2 == 0 and pas == False:
             moneyA[idA.index(ID)]*= give
             embed = discord.Embed(title="SkyBOT 도박 올인 : 성공", description="올인을 성공하여 [ "+str(give)+"배 ] 의 코인을 얻었어요! \n \n 현재 스카이코인 • "+str(moneyA[idA.index(ID)])+" 코인", timestamp=message.created_at,
             colour = discord.Colour.dark_green()       
     )
             embed.set_footer(text="올인 확률은 50 : 50이에요!")
             await message.channel.send(embed=embed)
-        elif give % 2 != 0:
+        elif give % 2 != 0 and pas == False:
             moneyA[idA.index(ID)] = 0
             embed = discord.Embed(title="SkyBOT 도박 올인 : 실패", description="올인을 성공했으면 [ "+str(give)+"배 ] 의 코인을 얻을 수 있었는데 실패했네요.. \n \n 현재 스카이코인 • "+str(moneyA[idA.index(ID)])+" 코인", timestamp=message.created_at,
             colour = discord.Colour.dark_red()       
@@ -167,6 +196,8 @@ async def on_message(message):
         f = open("UserData.txt", "w") #저장
         for i in range(0,len(idA),1):
             f.write(str(idA[i])+","+str(moneyA[i])+","+str(timeA[i])+"\n")
-        f.close()
+        f.close() 
 
-client.run("Token")
+
+
+client.run("NzM2MTM1NjcyODQyNDIwMzI2.XxqZxQ.DUq7pCmWrKccbocWksZGc7Hw-m0")

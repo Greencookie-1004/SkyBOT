@@ -62,4 +62,4 @@ async def on_message(message):
             embed.set_footer(text="Bot Developer 등급이상만 사용할 수 있는 명령입니다.")        
             await message.channel.send(embed=embed)
 
-client.run('Token')
+client.run('NzM2MTM1NjcyODQyNDIwMzI2.XxqZxQ.DUq7pCmWrKccbocWksZGc7Hw-m0')
