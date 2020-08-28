@@ -827,4 +827,4 @@ async def on_message(message):
         else:
             await message.channel.send("권한없음")
 
-client.run('NzM2MTM1NjcyODQyNDIwMzI2.XxqZxQ.NRqfu427toGKALzJxTnlw8NqcJU')
+client.run('')
