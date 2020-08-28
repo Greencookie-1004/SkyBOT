@@ -21,4 +21,4 @@ async def on_message(message):
         else:
             await message.channel.send('봇이 이미 들어와있습니다.') 
 
-client.run('NzM2MTM1NjcyODQyNDIwMzI2.XxqZxQ.qxhev3KcOcRWwQvqZNs1n2mzkTI')
+client.run('')
